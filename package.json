@@ -1,10 +1,10 @@
 {
-  "name": "form-fns-ts",
-  "version": "1.0.0",
+  "name": "react-funland",
+  "version": "0.0.1",
   "description": "Made with create-react-library",
   "author": "",
   "license": "MIT",
-  "repository": "/form-fns-ts",
+  "repository": "https://github.com/dongmingchao/react-funland.git",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.tsx",
