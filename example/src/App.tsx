@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { Form, Input, Button, Card, Space, Switch, Skeleton } from 'antd'
 import 'antd/dist/antd.css'
-import { when, crossMap } from 'form-fns-ts'
+import { when, crossMap } from 'react-funland'
 import { partial } from 'ramda'
 
 const formItemLayout = {
