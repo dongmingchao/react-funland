@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
+import { Empty } from './Empty'
+import { Merge } from './utils'
 
-export interface ItemProps {
+interface ItemProps {
   name: React.Key | React.Key[]
 }
 
@@ -9,11 +11,9 @@ interface WithChildren<O, P> extends ItemProps {
   itemCom?: React.ComponentType<O>
 }
 
-export type Merge<A, B> = Omit<A, keyof B> & B
-
 export type ColumnsType<O, P> = Merge<O, WithChildren<O, P>>
 
-export type ChildProps<C> = {
+type ChildProps<C> = {
   name?: React.Key | React.Key[]
   defaultChildCom?: React.ComponentType<C>
 }
@@ -26,10 +26,6 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 ) => void
   ? I
   : never
-
-export function Empty() {
-  return null
-}
 
 export function crossMap<O, C extends ColumnsType<O, any>>(
   defaultItemCom: React.ComponentType<O>,
