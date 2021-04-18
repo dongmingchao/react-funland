@@ -1,2 +1,4 @@
 export * from './crossMap'
-export * from './when'
+export * from './ifElse'
+export * from './utilsType'
+export * from './oProps'

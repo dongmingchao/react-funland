@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-export interface ItemProps {
+interface ItemProps {
   name: React.Key | React.Key[]
 }
 
@@ -9,11 +9,11 @@ interface WithChildren<O, P> extends ItemProps {
   itemCom?: React.ComponentType<O>
 }
 
-export type Merge<A, B> = Omit<A, keyof B> & B
+type Merge<A, B> = Omit<A, keyof B> & B
 
-export type ColumnsType<O, P> = Merge<O, WithChildren<O, P>>
+type ColumnsType<O, P> = Merge<O, WithChildren<O, P>>
 
-export type ChildProps<C> = {
+type ChildProps<C> = {
   name?: React.Key | React.Key[]
   defaultChildCom?: React.ComponentType<C>
 }
@@ -64,7 +64,7 @@ export function crossMap<O, C extends ColumnsType<O, any>>(
   }
 }
 
-function flat<T>(a: T | T[], b: T | T[]) {
+export function flat<T>(a: T | T[], b: T | T[]) {
   if (a instanceof Array) {
     return a.concat(b)
   }
