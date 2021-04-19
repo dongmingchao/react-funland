@@ -11,7 +11,9 @@ interface WithChildren<O, P> extends ItemProps {
   itemCom?: React.ComponentType<O>
 }
 
-export type ColumnsType<O, P> = Merge<O, WithChildren<O, P>>
+type Merge<A, B> = Omit<A, keyof B> & B
+
+type ColumnsType<O, P> = Merge<O, WithChildren<O, P>>
 
 type ChildProps<C> = {
   name?: React.Key | React.Key[]
@@ -60,7 +62,7 @@ export function crossMap<O, C extends ColumnsType<O, any>>(
   }
 }
 
-function flat<T>(a: T | T[], b: T | T[]) {
+export function flat<T>(a: T | T[], b: T | T[]) {
   if (a instanceof Array) {
     return a.concat(b)
   }

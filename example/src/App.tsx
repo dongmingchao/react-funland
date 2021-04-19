@@ -1,7 +1,8 @@
 import React from 'react'
-import TestMap from './TestMap'
+import 'antd/dist/antd.css'
+import TestMap from "./TestMap";
 
-function App() {
+ const App = () => {
   return <TestMap />
 }
 

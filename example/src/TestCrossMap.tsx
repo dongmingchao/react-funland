@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { Form, Input, Button, Card, Space, Switch, Skeleton } from 'antd'
 import 'antd/dist/antd.css'
-import { when, crossMap } from 'react-funland'
+import { ifElse, crossMap } from 'react-funland'
 import { partial } from 'ramda'
 
 const formItemLayout = {
@@ -27,21 +27,22 @@ type AppendPropsHoc<A> = <E>(
   t2: React.ComponentType<E>
 ) => React.ComponentType<A & E>
 
-const ifValueNotExist = partial(when, [
+const ifValueNotExist = partial(ifElse, [
   (p: { value: any }) => !p.value,
   () => <span>value is not exist!</span>
 ]) as <T>(
   a: React.ComponentType<{ value: T }>
 ) => React.ComponentType<{ value?: T }>
 
-export const ifEdit = partial(when, [
-  (p: { editing: boolean }) => p.editing
-]) as <A, B>(
+const ifEdit = partial(ifElse, [(p: { editing: boolean }) => p.editing]) as <
+  A,
+  B
+>(
   then: React.ComponentType<A>,
   base: React.ComponentType<B>
 ) => React.ComponentType<A & B & { editing: boolean }>
 
-const ifLoading = partial(when, [
+const ifLoading = partial(ifElse, [
   (p: { loading: boolean }) => p.loading,
   () => <Skeleton.Input active style={{ width: '300px' }} />
 ]) as AppendPropsHoc<{ loading: boolean }>
@@ -54,7 +55,8 @@ const FormItem = crossMap(Form.Item, [
   {
     name: 'account',
     label: '账号',
-    children: ifEdit(Input, ifLoading(ifValueNotExist(Base)))
+    children: ifEdit(Input, ifLoading(ifValueNotExist(Base))),
+    rules: [{ required: true }]
   },
   {
     name: 'age',

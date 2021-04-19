@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function when<P>(
+export function ifElse<P>(
   predicate: (p: P) => boolean | undefined | null,
   ThenCom: React.ComponentType<P>,
   BaseCom: React.ComponentType<P>
