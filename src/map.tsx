@@ -4,15 +4,16 @@ import { compose, lensProp, mergeWithKey, over } from 'ramda'
 
 export function overChildrenHoc<P extends { children: React.ComponentType }, C>(
   fn: SamePropsHoc<C>
-) {
-  return over(lensProp('children'), fn) as (
-    value: P
-  ) => Merge<
-    P,
-    {
-      children: React.ComponentType<C>
-    }
-  >
+): (
+  value: P
+) => Merge<
+  P,
+  {
+    children: React.ComponentType<C>
+  }
+> {
+  // @ts-ignore
+  return over(lensProp('children'), fn)
 }
 
 export function createChildren<
@@ -37,7 +38,7 @@ export function mapSameProps<T extends Mappable<C>, C>(items: T[]) {
     return React.createElement(
       React.Fragment,
       undefined,
-      items.map((c) => createChildren(c)(props))
+      items.map((c) => createChildren<T, C>(c)(props))
     )
   }
 }
@@ -52,15 +53,7 @@ export function mapHoc<T extends Mappable>(
   firstHoc: SamePropsHoc<T>,
   ...hocArray: SamePropsHoc<any>[]
 ) {
-  return mapSameProps<
-    Merge<
-      T,
-      {
-        children: React.ComponentType<T>
-      }
-    >,
-    Omit<T, keyof Mappable>
-  >(
+  return mapSameProps<any, Omit<T, keyof Mappable>>(
     items.map(
       overChildrenHoc(
         // @ts-ignore
