@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Empty } from './Empty'
-import { Merge } from './utils'
+import { Merge } from './utilsType'
 
 interface ItemProps {
   name: React.Key | React.Key[]
@@ -10,8 +10,6 @@ interface WithChildren<O, P> extends ItemProps {
   children?: React.ComponentType<P>
   itemCom?: React.ComponentType<O>
 }
-
-type Merge<A, B> = Omit<A, keyof B> & B
 
 type ColumnsType<O, P> = Merge<O, WithChildren<O, P>>
 

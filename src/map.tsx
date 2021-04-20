@@ -1,68 +1,71 @@
-import React, { useMemo } from 'react'
-import { Empty } from './Empty'
-import { Merge } from './utils'
+import React from 'react'
+import { Merge, SamePropsHoc } from './utilsType'
+import { compose, lensProp, mergeWithKey, over } from 'ramda'
 
-export interface ItemProps {
-  name: React.Key | React.Key[]
+export function overChildrenHoc<P extends { children: React.ComponentType }, C>(
+  fn: SamePropsHoc<C>
+) {
+  return over(lensProp('children'), fn) as (
+    value: P
+  ) => Merge<
+    P,
+    {
+      children: React.ComponentType<C>
+    }
+  >
 }
 
-interface WithChildren<P> extends ItemProps {
-  itemCom?: React.ComponentType<P>
+export function createChildren<
+  P extends { children: React.ComponentType<C> },
+  C
+>(
+  { children, ...rest }: P,
+  {
+    whenConflict = (_k, l) => l
+  }: {
+    whenConflict?: (k: string, l: C, r: Omit<P, 'children'>) => C
+  } = {}
+) {
+  return function (props: C) {
+    const finalProps = mergeWithKey(whenConflict, props, rest)
+    return React.createElement(children, finalProps)
+  }
 }
 
-export type ColumnsType<O, P> = Merge<
-  O,
-  React.PropsWithChildren<WithChildren<P>>
->
-
-export type ChildProps<C> = {
-  name?: React.Key | React.Key[]
-  defaultChildCom?: React.ComponentType<C>
-}
-
-// type OutputProps<O, T> = UnionToIntersection<
-//   T extends ColumnsType<O, infer P> ? P : object
-// >
-// type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-//   k: infer I
-// ) => void
-//   ? I
-//   : never
-
-export function map<P>(
-  columns: Array<React.PropsWithChildren<WithChildren<P>>>,
-  { name = [], defaultChildCom: DefaultChildCom = Empty }: ChildProps<P> = {}
-): React.ComponentType<P> {
-  return function (props) {
-    const ret = useMemo(
-      () =>
-        columns.map(
-          ({ name: subName, itemCom: ItemCom = DefaultChildCom, children }) => {
-            const finalName = flat(name, subName)
-            return React.createElement(
-              ItemCom,
-              {
-                key: finalName.join(),
-                ...props
-              },
-              children
-            )
-            // return (
-            //   <ItemCom key={finalName.join()} {...props}>
-            //     {children}
-            //   </ItemCom>
-            // )
-          }
-        ),
-      [props]
+export function mapSameProps<T extends Mappable<C>, C>(items: T[]) {
+  return function (props: C) {
+    return React.createElement(
+      React.Fragment,
+      undefined,
+      items.map((c) => createChildren(c)(props))
     )
-    return <React.Fragment>{ret}</React.Fragment>
   }
 }
 
-function flat<T>(a: T | T[], b: T | T[]) {
-  if (a instanceof Array) {
-    return a.concat(b)
-  }
-  return [a].concat(b)
+export interface Mappable<P = any> {
+  key: React.Key
+  children: React.ComponentType<P>
+}
+
+export function mapHoc<T extends Mappable>(
+  items: T[],
+  firstHoc: SamePropsHoc<T>,
+  ...hocArray: SamePropsHoc<any>[]
+) {
+  return mapSameProps<
+    Merge<
+      T,
+      {
+        children: React.ComponentType<T>
+      }
+    >,
+    Omit<T, keyof Mappable>
+  >(
+    items.map(
+      overChildrenHoc(
+        // @ts-ignore
+        hocArray.length ? compose(firstHoc, ...hocArray) : firstHoc
+      )
+    )
+  )
 }
