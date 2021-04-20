@@ -1,29 +1,14 @@
 ﻿import React, {useState} from 'react'
 import {Button, Card, Form, FormItemProps, Input, InputNumber, Switch} from 'antd'
-import {ifElse, mapHoc, oProps, SamePropsHoc,} from 'react-funland'
+import {ifElse, mapHoc, oProps, SamePropsHoc, wrapSameProps, Mappable, Merge} from 'react-funland'
 import {dissoc, partial, partialRight, propOr, when} from 'ramda'
 
-interface FinalProps extends FormItemProps {
-  key: React.Key
+interface FinalProps extends Merge<FormItemProps, Mappable> {
   editing?: boolean
-  children: React.ComponentType
 }
 
 const showOr = (e: React.ComponentType<FinalProps>) =>
   ifElse((props: FinalProps) => props.editing, e, propOr('---', 'value'))
-
-function wrapSameProps<P>(
-  Com: React.ComponentType<P>,
-  Wrapped: React.ComponentType<P>
-) {
-  return function (props: P) {
-    return (
-      <Com {...props}>
-        <Wrapped {...props} />
-      </Com>
-    )
-  }
-}
 
 const editHideRule = when(
   (p: FinalProps) => !p.editing,
@@ -59,7 +44,7 @@ const columns: FinalProps[] = [
   }
 ]
 
-const FinalRow = mapHoc<FinalProps>(columns, wrapWithFormItem, showOr, initProps);
+const FinalRow = mapHoc(columns, wrapWithFormItem, showOr, initProps);
 
 function TestMap() {
   const [editing, setEditing] = useState(false)
