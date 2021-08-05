@@ -13,3 +13,8 @@ export type PickComponentTypeProps<T> = T extends React.ComponentType<infer P>
   : any
 
 export type Merge<A, B> = Omit<A, keyof B> & B
+
+export type PartialPart<P, T extends keyof P> = Omit<P, T> &
+  {
+    [k in T]?: P[k]
+  }

@@ -14,11 +14,11 @@ const editHideRule = when(
   (p: FinalProps) => !p.editing,
   dissoc('rules')
 )
-const initProps = partialRight(oProps, [dissoc('editing')])
+const initProps = partialRight(oProps, [dissoc('editing')]) as <T>(Com: React.ComponentType<Omit<T, 'editing'>>) => React.ComponentType<T>;
 
-const wrapWithFormItem = partial(wrapSameProps, [
-  oProps(initProps(Form.Item), editHideRule)
-]) as SamePropsHoc<FinalProps>
+const formItem = oProps(initProps(Form.Item), editHideRule);
+
+const wrapWithFormItem = wrapSameProps(formItem);
 
 const columns: FinalProps[] = [
   {
