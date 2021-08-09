@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Merge, SamePropsHoc } from './utilsType'
 import { compose, lensProp, mergeWithKey, over } from 'ramda'
+import { Fragment } from './Empty'
 
 export function overChildrenHoc<P extends { children: React.ComponentType }, C>(
   fn: SamePropsHoc<C>
@@ -16,49 +17,36 @@ export function overChildrenHoc<P extends { children: React.ComponentType }, C>(
   return over(lensProp('children'), fn)
 }
 
-export function createChildren<
-  P extends { children: React.ComponentType<C> },
-  C
->(
-  { children, ...rest }: P,
-  {
-    whenConflict = (_k, l) => l
-  }: {
-    whenConflict?: (k: string, l: C, r: Omit<P, 'children'>) => C
-  } = {}
-) {
-  return function (props: C) {
-    const finalProps = mergeWithKey(whenConflict, props, rest)
-    return React.createElement(children, finalProps)
-  }
-}
-
-export function mapSameProps<T extends Mappable<C>, C>(items: T[]) {
-  return function (props: C) {
-    return React.createElement(
-      React.Fragment,
-      undefined,
-      items.map((c) => createChildren<T, C>(c)(props))
-    )
-  }
-}
-
 export interface Mappable<P = any> {
   key: React.Key
-  children: React.ComponentType<P>
+  children: P
 }
 
-export function mapHoc<T extends Mappable>(
+export interface ItemComProps<T, C = undefined> {
+  value: T
+  index: number
+  all: T[]
+  parent: C
+}
+
+export function map<T extends { key: React.Key }, C>(
   items: T[],
-  firstHoc: SamePropsHoc<T>,
-  ...hocArray: SamePropsHoc<any>[]
-) {
-  return mapSameProps<any, Omit<T, keyof Mappable>>(
-    items.map(
-      overChildrenHoc(
-        // @ts-ignore
-        hocArray.length ? compose(firstHoc, ...hocArray) : firstHoc
+  ItemCom: React.ComponentType<ItemComProps<T, C>>,
+  ParentCom: React.ComponentType<C> = Fragment
+): React.FunctionComponent<C> {
+  return function (props) {
+    return React.createElement(
+      ParentCom,
+      props,
+      items.map((t, i, all) =>
+        React.createElement(ItemCom, {
+          key: t.key,
+          value: t,
+          index: i,
+          all,
+          parent: props
+        })
       )
     )
-  )
+  }
 }

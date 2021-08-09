@@ -33,3 +33,19 @@ export function wrapSameProps<P>(
   }
   return _wrapSameProps(Com, Wrapped)
 }
+
+export function wrap2Props<A, B>(
+  Com: React.ComponentType<A>,
+  Wrapped: React.ComponentType<B>
+): React.FunctionComponent<{
+  outerProps: A
+  innerProps: B
+}> {
+  return function ({ outerProps, innerProps }) {
+    return (
+      <Com {...outerProps}>
+        <Wrapped {...innerProps} />
+      </Com>
+    )
+  }
+}

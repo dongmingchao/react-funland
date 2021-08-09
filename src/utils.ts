@@ -17,3 +17,10 @@ export function curry2<A, B, C>(
 
   return wrapSameProps
 }
+
+export function fold<R>(starter: R, reducers: Array<(f: R) => R>) {
+  return reducers.reduce(
+    (previousValue, currentValue) => currentValue(previousValue),
+    starter
+  )
+}
