@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Merge, SamePropsHoc } from './utilsType'
-import { compose, lensProp, mergeWithKey, over } from 'ramda'
+import { lensProp, over } from 'ramda'
 import { Fragment } from './Empty'
 
 export function overChildrenHoc<P extends { children: React.ComponentType }, C>(
@@ -29,6 +29,23 @@ export interface ItemComProps<T, C = undefined> {
   parent: C
 }
 
+function getKey<T extends { key: React.Key }>(t: T | T[]): React.Key {
+  if (t instanceof Array) {
+    return getKey(t[0])
+  }
+  return t.key
+}
+
+export function map<T extends { key: React.Key }, C>(
+  items: T[],
+  ItemCom: React.ComponentType<ItemComProps<T, C>>,
+  ParentCom?: React.ComponentType<C>
+): React.FunctionComponent<C>
+export function map<T extends { key: React.Key }, C>(
+  items: T[][],
+  ItemCom: React.ComponentType<ItemComProps<T[], C>>,
+  ParentCom?: React.ComponentType<C>
+): React.FunctionComponent<C>
 export function map<T extends { key: React.Key }, C>(
   items: T[],
   ItemCom: React.ComponentType<ItemComProps<T, C>>,
@@ -40,7 +57,7 @@ export function map<T extends { key: React.Key }, C>(
       props,
       items.map((t, i, all) =>
         React.createElement(ItemCom, {
-          key: t.key,
+          key: getKey(t),
           value: t,
           index: i,
           all,

@@ -36,16 +36,12 @@ export function wrapSameProps<P>(
 
 export function wrap2Props<A, B>(
   Com: React.ComponentType<A>,
-  Wrapped: React.ComponentType<B>
+  Wrapped: React.FunctionComponent<B>
 ): React.FunctionComponent<{
   outerProps: A
   innerProps: B
 }> {
-  return function ({ outerProps, innerProps }) {
-    return (
-      <Com {...outerProps}>
-        <Wrapped {...innerProps} />
-      </Com>
-    )
+  return function wrap2PropsComponent({ outerProps, innerProps }) {
+    return React.createElement(Com, outerProps, Wrapped(innerProps))
   }
 }

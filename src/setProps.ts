@@ -5,7 +5,7 @@ export function setProps<P, T extends keyof P>(
   preset: {
     [k in T]: P[k]
   }
-): React.ComponentType<Omit<P, T>> {
+): React.FunctionComponent<Omit<P, T>> {
   return function (props: Omit<P, T>) {
     return React.createElement(wrapped, {
       ...props,
