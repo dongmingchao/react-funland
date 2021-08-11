@@ -1,7 +1,8 @@
 import React from 'react'
 import { Merge, SamePropsHoc } from './utilsType'
-import { lensProp, over } from 'ramda'
+import { lensProp, over, splitEvery } from 'ramda'
 import { Fragment } from './Empty'
+import { wrap2Props } from './relation/wrap'
 
 export function overChildrenHoc<P extends { children: React.ComponentType }, C>(
   fn: SamePropsHoc<C>
@@ -66,4 +67,45 @@ export function map<T extends { key: React.Key }, C>(
       )
     )
   }
+}
+
+export function makeCol<T>(
+  Col: React.ComponentType,
+  wrapFormItem: React.FunctionComponent<T>
+) {
+  return function (props: T) {
+    const WrapCol = wrap2Props(Col, wrapFormItem)
+    return WrapCol({
+      outerProps: {
+        lg: 12,
+        xs: 24
+      },
+      innerProps: props
+    })
+  }
+}
+
+export function makeRow<T extends { key: React.Key }, C>(
+  Row: React.ComponentType,
+  Col: React.ComponentType,
+  each: React.FunctionComponent<ItemComProps<T, C>>
+) {
+  return function (props: ItemComProps<T[], C>) {
+    return <Row>{map(props.value, makeCol(Col, each))(props.parent)}</Row>
+  }
+}
+
+export function mapGrid<T extends { key: React.Key }, C>(
+  gridComponents: {
+    Row: React.ComponentType
+    Col: React.ComponentType
+  },
+  colNumber: number,
+  columns: T[],
+  ItemCom: React.FunctionComponent<ItemComProps<T, C>>
+) {
+  return map(
+    splitEvery(colNumber, columns),
+    makeRow(gridComponents.Row, gridComponents.Col, ItemCom)
+  )
 }
