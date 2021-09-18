@@ -24,7 +24,7 @@ export interface Mappable<P = any> {
 }
 
 export interface ItemComProps<T, C = undefined> {
-  value: T
+  item: T
   index: number
   all: T[]
   parent: C
@@ -59,7 +59,7 @@ export function map<T extends { key: React.Key }, C>(
       items.map((t, i, all) =>
         React.createElement(ItemCom, {
           key: getKey(t),
-          value: t,
+          item: t,
           index: i,
           all,
           parent: props
@@ -77,8 +77,9 @@ export function makeCol<T>(
     const WrapCol = wrap2Props(Col, wrapFormItem)
     return WrapCol({
       outerProps: {
-        lg: 12,
-        xs: 24
+        style: {
+          flexGrow: 1
+        }
       },
       innerProps: props
     })
@@ -90,8 +91,8 @@ export function makeRow<T extends { key: React.Key }, C>(
   Col: React.ComponentType,
   each: React.FunctionComponent<ItemComProps<T, C>>
 ) {
-  return function (props: ItemComProps<T[], C>) {
-    return <Row>{map(props.value, makeCol(Col, each))(props.parent)}</Row>
+  return function ({ item, parent }: ItemComProps<T[], C>) {
+    return <Row>{map(item, makeCol(Col, each))(parent)}</Row>
   }
 }
 

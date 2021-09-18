@@ -1,6 +1,16 @@
-﻿import React, {useState} from 'react'
+﻿import React, {FunctionComponent, useState} from 'react'
 import {Button, Card, Col, Form, FormItemProps, Input, InputNumber, Row, Switch} from 'antd'
-import {ifElse, ItemComProps, mapGrid, Mappable, oProps, setProps, wrap2Props} from 'react-funland'
+import {
+  flow,
+  Empty,
+  ifElse,
+  ItemComProps,
+  mapGrid,
+  Mappable,
+  oProps,
+  setProps,
+  wrap2Props,
+} from 'react-funland'
 import {dissoc, propOr, when} from 'ramda'
 import {ColProps, InputProps} from "antd/es";
 
@@ -71,15 +81,26 @@ function makeEach(props: ItemComProps<FinalProps, { editing?: boolean }>) {
     if (props.parent.editing) return p
     return dissoc('rules', p)
   });
-  const ChildCom = setProps(showOr(props.value.children), props.parent);
+  const ChildCom = setProps(showOr(props.item.children), props.parent);
   const wrapFormItem = wrap2Props(ParentCom, ChildCom)
   return wrapFormItem({
-    outerProps: props.value.itemProps,
+    outerProps: props.item.itemProps,
     innerProps: {}
   })
 }
 
-const FinalRow = mapGrid({ Row, Col }, 2, columns, makeEach)
+const fRec = flow<FunctionComponent<ItemComProps<FinalProps, { editing?: boolean }>>>(
+  Empty, [
+    () => p => p.item.children,
+    last => p => {
+    if (p.parent.editing) {
+      return React.createElement(last, p);
+    }
+    return <span>待定</span>
+    },
+  ])
+
+const FinalRow = mapGrid({ Row, Col }, 4, columns, fRec)
 
 function TestMap() {
   const [editing, setEditing] = useState(false)

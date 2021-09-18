@@ -40,7 +40,7 @@ export function curry3<A, B, C, D>(
   return upgrade
 }
 
-export function fold<R>(starter: R, reducers: Array<(f: R) => R>) {
+export function flow<R>(starter: R, reducers: Array<(f: R) => R>) {
   return reducers.reduce(
     (previousValue, currentValue) => currentValue(previousValue),
     starter
